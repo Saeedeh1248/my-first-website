@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>اطلاعات کاربر</title>
+<style>
+  body {
+    font-family: Tahoma, sans-serif;
+    background-color: #EFEFEF;
+    padding: 30px;
+    text-align: center;
+  }
+  h1 {
+    color: #333;
+  }
+  input {
+    padding: 10px;
+    width: 200px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+  }
+  button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  /* استایل کارت نمایش اطلاعات */
+  .user-card {
+    margin-top: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: Tahoma, sans-serif;
+    line-height: 1.6;
+  }
+  .user-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  .loading {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<h1>دریافت اطلاعات کاربر</h1>
+<input type="number" id="userId" placeholder="شماره کاربر (1-10)" min="1" max="10"/>
+<button onclick="fetchUser()">نمایش اطلاعات</button>
+
+<div id="loadingMsg" class="loading" style="display:none;">در حال بارگذاری...</div>
+<div id="userDisplay"></div>
+
+<script>
+function fetchUser() {
+  // استفاده از شی window برای گرفتن ورودی
+  const id = window.prompt("لطفاً شماره کاربر (1-10) را وارد کنید");
+  if (!id || isNaN(id) || id < 1 || id > 10) {
+    alert("لطفاً شماره معتبر وارد کنید (بین ۱ تا ۱۰)");
+    return;
+  }
+
+  // نشان دادن پیام لودینگ
+  document.getElementById('loadingMsg').style.display = 'block';
+  document.getElementById('userDisplay').innerHTML = '';
+
+  // ساخت URL API
+  const apiUrl = `https://jsonplaceholder.typicode.com/users/${id}`;
+
+  fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) throw new Error('کاربر پیدا نشد');
+      return response.json();
+    })
+    .then(user => {
+      // مخفی کردن لودینگ
+      document.getElementById('loadingMsg').style.display = 'none';
+
+      // نمایش اطلاعات user در قالب کارت
+      document.getElementById('userDisplay').innerHTML = `
+        <div class="user-card" style="direction: rtl;">
+          <h2>${user.name}</h2>
+          <p><strong>ایمیل:</strong> ${user.email}</p>
+          <p><strong>تلفن:</strong> ${user.phone}</p>
+          <p><strong>آدرس:</strong> ${user.address.street}, ${user.address.city}</p>
+          <p><strong>شرکت:</strong> ${user.company.name}</p>
+        </div>
+      `;
+    })
+    .catch(error => {
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('userDisplay').innerHTML = `<p style="color:red;">${error.message}</p>`;
+    });
+}
+</script>
+
+</body>
+</html>
